@@ -1,0 +1,31 @@
+---
+title: "Data Tidying"
+author: "Hunter Snyder"
+date: "1/16/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, warning = F, message = F}
+library(dplyr)
+library(tidyr)
+```
+
+
+
+# data cleaning
+read in data file 
+```{r}
+catch <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1",
+                  method = "libcurl"),
+                stringsAsFactors = FALSE)
+head(catch)
+```
+
+
+# split apply combine
+
+
