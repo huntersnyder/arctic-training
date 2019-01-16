@@ -207,6 +207,11 @@ head(catch)</code></pre>
 ## 4    SSE 1889       0     182   11   92    0 285             
 ## 5    SSE 1890       0     251   42    0    0 292             
 ## 6    SSE 1891       0     274   24    0    0 298</code></pre>
+<p>command + shift + m gives you the pipe operators %&gt;%</p>
+<pre class="r"><code>catch_cleaned &lt;- catch %&gt;% 
+  #negative values remove columns
+  select(-All, -notesRegCode) %&gt;% 
+  gather(key = &quot;species&quot;, value = &quot;catch&quot;, -Year, -Region)</code></pre>
 </div>
 <div id="split-apply-combine" class="section level1">
 <h1>split apply combine</h1>

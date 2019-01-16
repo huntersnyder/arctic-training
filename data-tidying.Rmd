@@ -25,7 +25,18 @@ catch <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.
 head(catch)
 ```
 
+ command + shift + m gives you the pipe operators %>% 
 
+ 
+```{r}
+
+catch_cleaned <- catch %>% 
+  #negative values remove columns
+  select(-All, -notesRegCode) %>% 
+  gather(key = "species", value = "catch", -Year, -Region)
+
+```
+ 
 # split apply combine
 
 
