@@ -19,10 +19,10 @@ library(tidyr)
 # data cleaning
 read in data file 
 ```{r}
-catch <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1",
+catch_long <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1",
                   method = "libcurl"),
                 stringsAsFactors = FALSE)
-head(catch)
+head(catch_long)
 ```
 
  command + shift + m gives you the pipe operators %>% 
@@ -30,13 +30,31 @@ head(catch)
  
 ```{r}
 
-catch_cleaned <- catch %>% 
+catch_df <- catch_long %>%
   #negative values remove columns
   select(-All, -notesRegCode) %>% 
   gather(key = "species", value = "catch", -Year, -Region)
 
 ```
- 
+
+```{r}
+catch_cleaned <- catch_df %>%
+  rename(catch_thousands = catch) %>%
+  mutate(xcatch = catch_thousands * 1000)
+
+head(catch_cleaned)
+```
+
+```{r}
+test_catch <- as.integer(catch_cleaned$catch_thousands)
+
+i <- which(is.na(test_catch) == T)
+
+catch_cleaned[i, ]
+```
+
+
 # split apply combine
+
 
 
