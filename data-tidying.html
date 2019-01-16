@@ -255,6 +255,11 @@ region_clean &lt;- region_defs %&gt;%
   select(code, mgmtArea)
 
 catch_joined &lt;- left_join(catch_cleaned, region_clean, by = c(&quot;Region&quot; = &quot;code&quot;))</code></pre>
+<pre class="r"><code>catch_wide &lt;- catch_cleaned %&gt;%
+  filter (Year &gt; 1990) %&gt;% 
+  select (-catch_thousands) %&gt;% 
+  spread(key = Year, value = catch)</code></pre>
+<p>Separate and unite</p>
 </div>
 
 

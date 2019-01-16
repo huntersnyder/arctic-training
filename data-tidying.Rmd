@@ -91,3 +91,16 @@ region_clean <- region_defs %>%
 catch_joined <- left_join(catch_cleaned, region_clean, by = c("Region" = "code"))
 ```
 
+```{r}
+catch_wide <- catch_cleaned %>%
+  filter (Year > 1990) %>% 
+  select (-catch_thousands) %>% 
+  spread(key = Year, value = catch)
+```
+
+Separate and unite
+
+```{r}
+
+```
+
