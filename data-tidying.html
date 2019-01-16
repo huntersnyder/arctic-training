@@ -196,10 +196,10 @@ library(tidyr)</code></pre>
 <div id="data-cleaning" class="section level1">
 <h1>data cleaning</h1>
 <p>read in data file</p>
-<pre class="r"><code>catch &lt;- read.csv(url(&quot;https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1&quot;,
+<pre class="r"><code>catch_long &lt;- read.csv(url(&quot;https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1&quot;,
                   method = &quot;libcurl&quot;),
                 stringsAsFactors = FALSE)
-head(catch)</code></pre>
+head(catch_long)</code></pre>
 <pre><code>##   Region Year Chinook Sockeye Coho Pink Chum All notesRegCode
 ## 1    SSE 1886       0       5    0    0    0   5             
 ## 2    SSE 1887       0     155    0    0    0 155             
@@ -208,13 +208,53 @@ head(catch)</code></pre>
 ## 5    SSE 1890       0     251   42    0    0 292             
 ## 6    SSE 1891       0     274   24    0    0 298</code></pre>
 <p>command + shift + m gives you the pipe operators %&gt;%</p>
-<pre class="r"><code>catch_cleaned &lt;- catch %&gt;% 
+<pre class="r"><code>catch_df &lt;- catch_long %&gt;%
   #negative values remove columns
   select(-All, -notesRegCode) %&gt;% 
   gather(key = &quot;species&quot;, value = &quot;catch&quot;, -Year, -Region)</code></pre>
+<p>Removed an erroneous OCR value Recalculated the catches to thousands</p>
+<pre class="r"><code>catch_cleaned &lt;- catch_df %&gt;%
+  rename(catch_thousands = catch) %&gt;%
+  mutate(catch_thousands = ifelse(catch_thousands == &quot;I&quot;, 1, catch_thousands)) %&gt;%
+  mutate(catch_thousands = as.integer(catch_thousands)) %&gt;%  
+  mutate(catch = catch_thousands * 1000)
+
+head(catch_cleaned)</code></pre>
+<pre><code>##   Region Year species catch_thousands catch
+## 1    SSE 1886 Chinook               0     0
+## 2    SSE 1887 Chinook               0     0
+## 3    SSE 1888 Chinook               0     0
+## 4    SSE 1889 Chinook               0     0
+## 5    SSE 1890 Chinook               0     0
+## 6    SSE 1891 Chinook               0     0</code></pre>
+<pre class="r"><code>#i used this code to find the bad value
+test_catch &lt;- as.integer(catch_cleaned$catch_thousands)
+
+i &lt;- which(is.na(test_catch) == T)
+
+catch_cleaned[i, ]</code></pre>
+<pre><code>## [1] Region          Year            species         catch_thousands
+## [5] catch          
+## &lt;0 rows&gt; (or 0-length row.names)</code></pre>
 </div>
 <div id="split-apply-combine" class="section level1">
 <h1>split apply combine</h1>
+<p>calculate total catch by region</p>
+<pre class="r"><code>catch_total &lt;- catch_cleaned %&gt;% 
+  group_by(species, Year) %&gt;% 
+  summarize(mean_catches_across_regions = mean(catch),
+            n_obs = n())</code></pre>
+<p>filter for chinook salmon</p>
+<pre class="r"><code>catch_chinookchum &lt;- catch_cleaned %&gt;% 
+  filter(species == &quot;Chinook&quot; | species == &quot;Chum&quot;) %&gt;% 
+  arrange(-Year)</code></pre>
+<p>bringing in the other data frame</p>
+<pre class="r"><code>region_defs &lt;- read.csv (file =&quot;https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1&quot;, stringsAsFactors = FALSE)
+
+region_clean &lt;- region_defs %&gt;% 
+  select(code, mgmtArea)
+
+catch_joined &lt;- left_join(catch_cleaned, region_clean, by = c(&quot;Region&quot; = &quot;code&quot;))</code></pre>
 </div>
 
 

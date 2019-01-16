@@ -37,15 +37,23 @@ catch_df <- catch_long %>%
 
 ```
 
+
+Removed an erroneous OCR value
+Recalculated the catches to thousands
+
 ```{r}
 catch_cleaned <- catch_df %>%
   rename(catch_thousands = catch) %>%
-  mutate(xcatch = catch_thousands * 1000)
+  mutate(catch_thousands = ifelse(catch_thousands == "I", 1, catch_thousands)) %>%
+  mutate(catch_thousands = as.integer(catch_thousands)) %>%  
+  mutate(catch = catch_thousands * 1000)
 
 head(catch_cleaned)
 ```
 
 ```{r}
+
+#i used this code to find the bad value
 test_catch <- as.integer(catch_cleaned$catch_thousands)
 
 i <- which(is.na(test_catch) == T)
@@ -56,5 +64,30 @@ catch_cleaned[i, ]
 
 # split apply combine
 
+calculate total catch by region 
 
+```{r}
+catch_total <- catch_cleaned %>% 
+  group_by(species, Year) %>% 
+  summarize(mean_catches_across_regions = mean(catch),
+            n_obs = n())
+```
+
+filter for chinook salmon 
+
+```{r}
+catch_chinookchum <- catch_cleaned %>% 
+  filter(species == "Chinook" | species == "Chum") %>% 
+  arrange(-Year)
+```
+
+bringing in the other data frame  
+```{r}
+region_defs <- read.csv (file ="https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1", stringsAsFactors = FALSE)
+
+region_clean <- region_defs %>% 
+  select(code, mgmtArea)
+
+catch_joined <- left_join(catch_cleaned, region_clean, by = c("Region" = "code"))
+```
 
