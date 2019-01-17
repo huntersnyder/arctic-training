@@ -10,11 +10,12 @@ output: html_document
 library(ggplot2)
 library(tidyverse)
 library(DT)
+library(leaflet)
 ```
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
@@ -79,4 +80,24 @@ ggsave("region_escapement.png")
 ```
  
 # Interactive Map
+
+making a mpa using leaflet
+
+*find unique locations with lat lon values
+
+```{r}
+locations <- esc %>% 
+  distinct(Location, Latitude, Longitude) %>% 
+  drop_na()
+  
+datatable(locations)
+```
+create our leaflet map
+```{r}
+leaflet(locations) %>% 
+  addTiles() %>% 
+  addMarkers(~ Longitude, ~ Latitude, popup = ~ Location)
+
+```
+ 
  
