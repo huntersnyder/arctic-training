@@ -1,0 +1,17 @@
+---
+title: "temp-test"
+author: "Hunter Snyder"
+date: "1/17/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Source our utility functions and test time 
+
+```{r}
+source("fahr_to_cels.R")
+```
+
